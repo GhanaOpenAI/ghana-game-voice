@@ -23,25 +23,22 @@ pip install "ghana-game-voice[api] @ git+https://github.com/GhanaOpenAI/ghana-ga
 
 ## Voices
 
-By default you get the **combat set**: 19 short, expressive clips picked for a combat game, each with a
-label `voice - emotion` and a game role:
+By default you get the **combat set**: 19 short, expressive clips picked for a combat game. You choose a
+voice by its **role**; each also keeps its dataset label (`voice - emotion`):
 
-| roles | voices |
+| group | voices |
 |---|---|
-| enraged fighter, confrontation, boss rant, threat, "get out!" | `adult male - angry #1`-`#5`, `adult female - angry` |
-| cold, quiet threat · last warning · seething | `adult male - calm`, `adult male - warning`, `adult male - frustrated` |
-| taunt · mocking | `adult male - insulting`, `adult female - sarcastic`, `adult male - sarcastic` |
-| suspicious guard · warning / mission giver | `adult male - doubtful`, `young female - stern` |
-| begging for life · desperate plea · pleading | `adult male - pleading`, `adult male - disagreeing`, `young female - pleading` |
-| terrified · wounded | `young female - anxiety`, `adult female - hurt` |
+| aggression | `enraged fighter (male)`, `enraged fighter (female)`, `confrontation`, `boss rant`, `threat`, `cold threat`, `get out!` |
+| warnings | `last warning`, `seething`, `mission giver`, `suspicious guard` |
+| taunts | `taunt (male)`, `taunt (female)`, `mocking` |
+| defeat | `begging for life`, `desperate plea`, `pleading (female)`, `terrified`, `wounded` |
 
-Labels shared by several clips are numbered `#1`, `#2`, ...; asking for the bare label gives `#1`.
 The voices are Twi speakers; they speak Ewe lines too.
 
 ```bash
-ghana-game-voice voices              # name, role, length and transcription of every voice
+ghana-game-voice voices              # name, dataset label, length and transcription of every voice
 ghana-game-voice voices --json
-ghana-game-voice --all-voices voices # every clip in the dataset, not just the combat set
+ghana-game-voice --all-voices voices # every clip in the dataset (named by label), not just the combat set
 ghana-game-voice languages           # twi-asante, ewe
 ```
 
@@ -51,8 +48,8 @@ Make your own set: a JSON list of `{"file": "audio/0168.wav", "role": "..."}` en
 ## Command line
 
 ```bash
-ghana-game-voice speak "Fi me kwan so!" -v "adult male - angry #4" -l twi -o line.wav
-ghana-game-voice speak "Màsi le asinye o!" -v "adult male - calm" -l ewe -o ewe.wav
+ghana-game-voice speak "Fi me kwan so!" -v threat -l twi -o line.wav
+ghana-game-voice speak "Màsi le asinye o!" -v "cold threat" -l ewe -o ewe.wav
 ghana-game-voice speak "Me daase pii." --ref-audio my_voice.wav --ref-text "…" -o mine.wav   # your own voice
 ```
 
@@ -65,11 +62,11 @@ from ghana_game_voice import GameVoice
 
 gv = GameVoice()                                   # GPU if available
 for v in gv.voices().values():
-    print(v.name, v.role, v.text)
+    print(v.name, v.label, v.text)
 
-sr, wav = gv.speak("Fi me kwan so!", voice="adult male - angry #4", language="twi",
+sr, wav = gv.speak("Fi me kwan so!", voice="threat", language="twi",
                    out="line.wav")                 # returns (24000, float32 samples), and writes the file
-wav_bytes = gv.speak_wav_bytes("Meɖe kuku, kpɔ nublanui nam!", voice="young female - pleading", language="ewe")
+wav_bytes = gv.speak_wav_bytes("Meɖe kuku, kpɔ nublanui nam!", voice="pleading (female)", language="ewe")
 ```
 
 The model loads on the first `speak()` and stays loaded; later lines take about a second or two on a GPU.
@@ -90,7 +87,7 @@ ghana-game-voice serve --port 8000 --preload       # interactive docs at http://
 
 ```bash
 curl -X POST localhost:8000/speak -H "Content-Type: application/json" \
-     -d '{"text": "Wo yɛ aboa!", "voice": "adult male - angry #2", "language": "twi"}' -o line.wav
+     -d '{"text": "Wo yɛ aboa!", "voice": "taunt (male)", "language": "twi"}' -o line.wav
 ```
 
 ## Languages

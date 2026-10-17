@@ -10,8 +10,8 @@ from .tts import LANGUAGES, GameVoice
 
 class SpeakRequest(BaseModel):
     text: str = Field(..., examples=["Fi me dan mu seesei ara!"])
-    voice: Optional[str] = Field(None, description="voice name or label from GET /voices (default: the first)",
-                                 examples=["adult male - angry"])
+    voice: Optional[str] = Field(None, description="voice name from GET /voices (default: the first)",
+                                 examples=["threat"])
     language: str = Field("twi-asante", description="language code or name, see GET /languages")
     guidance: float = 2.0
     steps: int = 32

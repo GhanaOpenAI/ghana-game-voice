@@ -11,14 +11,14 @@ VOICES = GV.voices()
 
 # line, language, voice: each example sets all three
 EXAMPLES = [
-    ["Fi me kwan so! Gyae me kwan na mɛtwa wo ti!", "Twi (Asante)", "adult male - angry #4"],
-    ["Worenguan mfi me nkyɛn!", "Twi (Asante)", "adult male - calm"],
-    ["Tow hyɛ wɔn so mprempren!", "Twi (Asante)", "adult male - angry #1"],
-    ["Mesrɛ wo, hu me mmɔbɔ!", "Twi (Asante)", "adult male - pleading"],
-    ["Dwane! Wɔreba!", "Twi (Asante)", "young female - anxiety"],
-    ["Do le nye mɔ dzi!", "Ewe", "adult male - angry #5"],
-    ["Màsi le asinye o!", "Ewe", "adult male - calm"],
-    ["Meɖe kuku, kpɔ nublanui nam!", "Ewe", "young female - pleading"],
+    ["Fi me kwan so! Gyae me kwan na mɛtwa wo ti!", "Twi (Asante)", "threat"],
+    ["Worenguan mfi me nkyɛn!", "Twi (Asante)", "cold threat"],
+    ["Tow hyɛ wɔn so mprempren!", "Twi (Asante)", "enraged fighter (male)"],
+    ["Mesrɛ wo, hu me mmɔbɔ!", "Twi (Asante)", "begging for life"],
+    ["Dwane! Wɔreba!", "Twi (Asante)", "terrified"],
+    ["Do le nye mɔ dzi!", "Ewe", "get out!"],
+    ["Màsi le asinye o!", "Ewe", "cold threat"],
+    ["Meɖe kuku, kpɔ nublanui nam!", "Ewe", "pleading (female)"],
 ]
 EXAMPLES = [e for e in EXAMPLES if e[2] in VOICES]
 
@@ -26,7 +26,7 @@ EXAMPLES = [e for e in EXAMPLES if e[2] in VOICES]
 def preview(name):
     """Reference clip + its transcription, shown when a voice is chosen."""
     v = VOICES.get(name)
-    return (v.audio, f"**{v.role}** · “{v.text}”") if v else (None, "")
+    return (v.audio, f"{v.label} · “{v.text}”") if v else (None, "")
 
 
 def synthesize(text, language, voice, own_audio, own_transcript, guidance, steps):
@@ -54,8 +54,7 @@ with gr.Blocks(title="Ghana Game Voice") as demo:
             text = gr.Textbox(label="What does the character say?", lines=3, placeholder="e.g. Fi me kwan so!")
             language = gr.Dropdown(list(LANGUAGES), value="Twi (Asante)", label="Language")
             first = next(iter(VOICES))
-            voice = gr.Dropdown([(f"{n}  ·  {v.role}", n) for n, v in VOICES.items()], value=first,
-                                label="Reference voice (voice - emotion · game role)")
+            voice = gr.Dropdown(list(VOICES), value=first, label="Voice")
             ref_audio = gr.Audio(value=preview(first)[0], label="Reference clip", type="filepath", interactive=False)
             ref_text = gr.Markdown(preview(first)[1])
             btn = gr.Button("Generate", variant="primary")

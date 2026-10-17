@@ -17,7 +17,7 @@ def main(argv=None):
 
     s = sub.add_parser("speak", help="generate speech to a WAV file")
     s.add_argument("text", help="what the character says")
-    s.add_argument("-v", "--voice", help='voice name or label, e.g. "adult male - angry" or "adult female - stern #2"')
+    s.add_argument("-v", "--voice", help='voice name, e.g. "threat" or "taunt (female)" (see `voices`)')
     s.add_argument("-l", "--language", default="twi-asante", help="twi-asante (default) or ewe")
     s.add_argument("-o", "--out", default="speech.wav", help="output WAV file (default: speech.wav)")
     s.add_argument("--ref-audio", help="use your own 3-10 s reference clip instead of a labelled voice")
@@ -50,9 +50,9 @@ def main(argv=None):
         if a.json:
             print(json.dumps([x.to_dict() for x in vs.values()], ensure_ascii=False, indent=1))
         else:
-            width, rw = max(len(n) for n in vs), max(len(x.role) for x in vs.values())
+            width, lw = max(len(n) for n in vs), max(len(x.label) for x in vs.values())
             for x in vs.values():
-                print(f"{x.name:{width}s}  {x.role:{rw}s}  {x.duration:4.1f}s  {x.text}")
+                print(f"{x.name:{width}s}  {(x.label if x.label != x.name else ''):{lw}s}  {x.duration:4.1f}s  {x.text}")
         return
 
     if a.cmd == "speak":
