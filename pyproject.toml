@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghana-game-voice"
+version = "0.1.0"
+description = "Speak lines in Ghanaian languages with OmniVoice-Ghana in labelled reference voices (Python, CLI, HTTP API)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "omnivoice @ git+https://github.com/k2-fsa/OmniVoice.git@08be0b4ccbac3e13e374e86fbfead4b4cac343e2",
+    "torch",
+    "torchaudio",
+    "huggingface_hub",
+    "soundfile",
+    "numpy",
+]
+
+[project.optional-dependencies]
+api = ["fastapi", "uvicorn"]
+
+[project.scripts]
+ghana-game-voice = "ghana_game_voice.cli:main"
+
+[tool.setuptools]
+packages = ["ghana_game_voice"]
