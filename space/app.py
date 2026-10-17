@@ -9,19 +9,24 @@ from ghana_game_voice import DATASET, LANGUAGES, GameVoice
 GV = GameVoice(voices_dir=os.path.join(os.path.dirname(os.path.abspath(__file__)), "prompt_audio"))
 VOICES = GV.voices()
 
+# line, language, voice: each example sets all three
 EXAMPLES = [
-    ["Gyae me kwan na mɛtwa wo ti! Obiara ntumi nsi me kwan wɔ ha!", "Twi (Asante)"],
-    ["Nsuro, me nua. Yɛbɛdi nkunim bɔɔbɔ.", "Twi (Asante)"],
-    ["Me daase pii, Nyame nhyira wo.", "Twi (Asante)"],
-    ["Akpe na wò, Mawu neyra wò.", "Ewe"],
-    ["Bi zɔri mi ni be chɛŋ shukuru be konko.", "Dagbani"],
+    ["Fi me kwan so! Gyae me kwan na mɛtwa wo ti!", "Twi (Asante)", "adult male - angry #4"],
+    ["Worenguan mfi me nkyɛn!", "Twi (Asante)", "adult male - calm"],
+    ["Tow hyɛ wɔn so mprempren!", "Twi (Asante)", "adult male - angry #1"],
+    ["Mesrɛ wo, hu me mmɔbɔ!", "Twi (Asante)", "adult male - pleading"],
+    ["Dwane! Wɔreba!", "Twi (Asante)", "young female - anxiety"],
+    ["Do le nye mɔ dzi!", "Ewe", "adult male - angry #5"],
+    ["Màsi le asinye o!", "Ewe", "adult male - calm"],
+    ["Meɖe kuku, kpɔ nublanui nam!", "Ewe", "young female - pleading"],
 ]
+EXAMPLES = [e for e in EXAMPLES if e[2] in VOICES]
 
 
 def preview(name):
     """Reference clip + its transcription, shown when a voice is chosen."""
     v = VOICES.get(name)
-    return (v.audio, f"“{v.text}”") if v else (None, "")
+    return (v.audio, f"**{v.role}** · “{v.text}”") if v else (None, "")
 
 
 def synthesize(text, language, voice, own_audio, own_transcript, guidance, steps):
@@ -38,17 +43,19 @@ def synthesize(text, language, voice, own_audio, own_transcript, guidance, steps
 with gr.Blocks(title="Ghana Game Voice") as demo:
     gr.Markdown(
         "# 🇬🇭 Ghana Game Voice\n"
-        "Type a line a game character would say, pick the language and a **reference voice**, and press **Generate**.  \n"
-        f"The voices are [{len(VOICES)} hand-checked, labelled clips](https://huggingface.co/datasets/{DATASET}); "
-        "the model speaks your line in that voice and mood. Also available as a Python package, CLI and API: "
+        "Type a line a character says in battle, in **Twi** or **Ewe**, pick a **reference voice**, and press **Generate**.  \n"
+        f"The {len(VOICES)} voices are combat-ready clips (angry, threatening, taunting, pleading, scared, ...) from "
+        f"[hand-checked, labelled recordings](https://huggingface.co/datasets/{DATASET}); the model speaks your line "
+        "in that voice and mood. Also available as a Python package, CLI and API: "
         "[github.com/GhanaOpenAI/ghana-game-voice](https://github.com/GhanaOpenAI/ghana-game-voice)."
     )
     with gr.Row():
         with gr.Column():
-            text = gr.Textbox(label="What does the character say?", lines=3, placeholder="e.g. Fi me dan mu seesei ara!")
+            text = gr.Textbox(label="What does the character say?", lines=3, placeholder="e.g. Fi me kwan so!")
             language = gr.Dropdown(list(LANGUAGES), value="Twi (Asante)", label="Language")
             first = next(iter(VOICES))
-            voice = gr.Dropdown(list(VOICES), value=first, label="Reference voice (voice - emotion)")
+            voice = gr.Dropdown([(f"{n}  ·  {v.role}", n) for n, v in VOICES.items()], value=first,
+                                label="Reference voice (voice - emotion · game role)")
             ref_audio = gr.Audio(value=preview(first)[0], label="Reference clip", type="filepath", interactive=False)
             ref_text = gr.Markdown(preview(first)[1])
             btn = gr.Button("Generate", variant="primary")
@@ -61,7 +68,7 @@ with gr.Blocks(title="Ghana Game Voice") as demo:
             out = gr.Audio(label="Generated speech", type="numpy")
             ref_info = gr.Markdown()
 
-    gr.Examples(EXAMPLES, inputs=[text, language])
+    gr.Examples(EXAMPLES, inputs=[text, language, voice])
     gr.Markdown("The first generation takes a minute or two while the model loads. Model: "
                 "[ghananlpcommunity/omnivoice-ghana](https://huggingface.co/ghananlpcommunity/omnivoice-ghana) "
                 "(checkpoint-45000).")

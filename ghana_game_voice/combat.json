@@ -1,0 +1,21 @@
+[
+ {"file": "audio/0168.wav", "role": "enraged fighter"},
+ {"file": "audio/0190.wav", "role": "confrontation"},
+ {"file": "audio/0219.wav", "role": "boss rant"},
+ {"file": "audio/0224.wav", "role": "threat"},
+ {"file": "audio/0249.wav", "role": "\"get out!\""},
+ {"file": "audio/0016.wav", "role": "cold, quiet threat"},
+ {"file": "audio/0088.wav", "role": "enraged fighter"},
+ {"file": "audio/0089.wav", "role": "last warning"},
+ {"file": "audio/0134.wav", "role": "seething"},
+ {"file": "audio/0135.wav", "role": "warning / mission giver"},
+ {"file": "audio/0235.wav", "role": "taunt"},
+ {"file": "audio/0211.wav", "role": "taunt"},
+ {"file": "audio/0215.wav", "role": "mocking"},
+ {"file": "audio/0242.wav", "role": "suspicious guard"},
+ {"file": "audio/0002.wav", "role": "begging for life"},
+ {"file": "audio/0103.wav", "role": "desperate plea"},
+ {"file": "audio/0005.wav", "role": "pleading"},
+ {"file": "audio/0169.wav", "role": "terrified"},
+ {"file": "audio/0220.wav", "role": "wounded"}
+]

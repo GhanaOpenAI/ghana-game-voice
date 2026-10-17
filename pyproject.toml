@@ -26,3 +26,6 @@ ghana-game-voice = "ghana_game_voice.cli:main"
 
 [tool.setuptools]
 packages = ["ghana_game_voice"]
+
+[tool.setuptools.package-data]
+ghana_game_voice = ["combat.json"]

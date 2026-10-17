@@ -1,8 +1,9 @@
 # Ghana Game Voice
 
-Speak lines in Ghanaian languages with [OmniVoice-Ghana](https://huggingface.co/ghananlpcommunity/omnivoice-ghana),
-in a **labelled reference voice**: pick `adult male - angry`, `adult female - tender`, `young male - happy`, ...
-from the hand-checked clips in [ghanaopenai/ghana-audio-prompts](https://huggingface.co/datasets/ghanaopenai/ghana-audio-prompts),
+Voice lines for a combat game in **Asante Twi** and **Ewe**, spoken by
+[OmniVoice-Ghana](https://huggingface.co/ghananlpcommunity/omnivoice-ghana) in a **labelled reference voice**:
+pick an enraged fighter, a cold threat, a taunt, a begging enemy, a terrified villager, ... from hand-checked
+clips in [ghanaopenai/ghana-audio-prompts](https://huggingface.co/datasets/ghanaopenai/ghana-audio-prompts),
 and the model says your line in that voice and mood. Use it from **Python**, the **command line** or an **HTTP API**.
 
 Try it in the browser: [Ghana Game Voice Space](https://huggingface.co/spaces/ghananlpcommunity/ghana-game-voice).
@@ -22,20 +23,36 @@ pip install "ghana-game-voice[api] @ git+https://github.com/GhanaOpenAI/ghana-ga
 
 ## Voices
 
-Every clip in the dataset has a label `voice - emotion`. Labels shared by several clips are numbered
-`adult male - angry #1`, `#2`, ...; asking for the bare label gives `#1`.
+By default you get the **combat set**: 19 short, expressive clips picked for a combat game, each with a
+label `voice - emotion` and a game role:
+
+| roles | voices |
+|---|---|
+| enraged fighter, confrontation, boss rant, threat, "get out!" | `adult male - angry #1`-`#5`, `adult female - angry` |
+| cold, quiet threat · last warning · seething | `adult male - calm`, `adult male - warning`, `adult male - frustrated` |
+| taunt · mocking | `adult male - insulting`, `adult female - sarcastic`, `adult male - sarcastic` |
+| suspicious guard · warning / mission giver | `adult male - doubtful`, `young female - stern` |
+| begging for life · desperate plea · pleading | `adult male - pleading`, `adult male - disagreeing`, `young female - pleading` |
+| terrified · wounded | `young female - anxiety`, `adult female - hurt` |
+
+Labels shared by several clips are numbered `#1`, `#2`, ...; asking for the bare label gives `#1`.
+The voices are Twi speakers; they speak Ewe lines too.
 
 ```bash
-ghana-game-voice voices            # name, length and transcription of every voice
+ghana-game-voice voices              # name, role, length and transcription of every voice
 ghana-game-voice voices --json
-ghana-game-voice languages         # twi-asante, twi-akuapem, fat, ewe, dag, dga, ada, nzi, hau, en
+ghana-game-voice --all-voices voices # every clip in the dataset, not just the combat set
+ghana-game-voice languages           # twi-asante, ewe
 ```
+
+Make your own set: a JSON list of `{"file": "audio/0168.wav", "role": "..."}` entries, passed as
+`--voice-set my_set.json` (CLI) or `GameVoice(voice_set="my_set.json")`; see `ghana_game_voice/combat.json`.
 
 ## Command line
 
 ```bash
-ghana-game-voice speak "Fi me dan mu seesei ara!" -v "adult male - angry" -l twi -o line.wav
-ghana-game-voice speak "Akpe na wò, Mawu neyra wò." -v "adult female - grateful" -l ewe -o ewe.wav
+ghana-game-voice speak "Fi me kwan so!" -v "adult male - angry #4" -l twi -o line.wav
+ghana-game-voice speak "Màsi le asinye o!" -v "adult male - calm" -l ewe -o ewe.wav
 ghana-game-voice speak "Me daase pii." --ref-audio my_voice.wav --ref-text "…" -o mine.wav   # your own voice
 ```
 
@@ -48,11 +65,11 @@ from ghana_game_voice import GameVoice
 
 gv = GameVoice()                                   # GPU if available
 for v in gv.voices().values():
-    print(v.name, v.speaker, v.emotion, v.text)
+    print(v.name, v.role, v.text)
 
-sr, wav = gv.speak("Fi me dan mu seesei ara!", voice="adult male - angry", language="twi",
+sr, wav = gv.speak("Fi me kwan so!", voice="adult male - angry #4", language="twi",
                    out="line.wav")                 # returns (24000, float32 samples), and writes the file
-wav_bytes = gv.speak_wav_bytes("Me daase pii.", voice="adult female - grateful")
+wav_bytes = gv.speak_wav_bytes("Meɖe kuku, kpɔ nublanui nam!", voice="young female - pleading", language="ewe")
 ```
 
 The model loads on the first `speak()` and stays loaded; later lines take about a second or two on a GPU.
@@ -65,7 +82,7 @@ ghana-game-voice serve --port 8000 --preload       # interactive docs at http://
 
 | endpoint | |
 |---|---|
-| `GET /voices` | all voices: name, label, speaker, emotion, transcription, duration |
+| `GET /voices` | all voices: name, label, speaker, emotion, role, transcription, duration |
 | `GET /voices/{name}/audio` | a voice's reference clip (WAV) |
 | `GET /languages` | supported languages |
 | `POST /speak` | `{"text", "voice", "language", "guidance", "steps", "speed"}` → WAV audio |
@@ -78,9 +95,7 @@ curl -X POST localhost:8000/speak -H "Content-Type: application/json" \
 
 ## Languages
 
-Asante and Akuapem Twi, Fante, Ewe, Dagbani, Dagaare, Dangme, Nzema, Hausa and English (codes from
-`ghana-game-voice languages`; names like `Ewe` or `twi` work too). The reference voices are mostly
-Twi speakers; they can speak any of these languages.
+**Asante Twi** (`twi-asante`, or `twi`) and **Ewe** (`ewe`).
 
 ## Repo layout
 

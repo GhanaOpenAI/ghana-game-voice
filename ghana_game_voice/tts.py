@@ -11,22 +11,12 @@ MODEL_REPO = "ghananlpcommunity/omnivoice-ghana"
 CHECKPOINT = "checkpoint-45000"
 SAMPLE_RATE = 24000
 
-# Languages the omnivoice-ghana fine-tune was trained on: name -> OmniVoice language code.
+# Game languages: name -> OmniVoice-Ghana language code.
 LANGUAGES = {
     "Twi (Asante)": "twi-asante",
-    "Twi (Akuapem)": "twi-akuapem",
-    "Fante": "fat",
     "Ewe": "ewe",
-    "Dagbani": "dag",
-    "Dagaare": "dga",
-    "Dangme": "ada",
-    "Nzema": "nzi",
-    "Hausa": "hau",
-    "English": "en",
 }
-_ALIASES = {"twi": "twi-asante", "asante twi": "twi-asante", "akuapem twi": "twi-akuapem", "fante": "fat",
-            "ewe": "ewe", "dagbani": "dag", "dagaare": "dga", "dangme": "ada", "nzema": "nzi", "hausa": "hau",
-            "english": "en"}
+_ALIASES = {"twi": "twi-asante", "asante twi": "twi-asante", "asante": "twi-asante", "ewe": "ewe"}
 
 
 def language_code(language):
@@ -75,11 +65,11 @@ class GameVoice:
     The model loads on first use (a GPU is strongly recommended; CPU works but is slow).
     """
 
-    def __init__(self, device=None, dataset=DATASET, voices_dir=None, checkpoint=CHECKPOINT):
+    def __init__(self, device=None, dataset=DATASET, voices_dir=None, checkpoint=CHECKPOINT, voice_set="combat"):
         import torch
         self.device = device or ("cuda:0" if torch.cuda.is_available() else "cpu")
         self.checkpoint = checkpoint
-        self._voices = load_voices(dataset, local_dir=voices_dir)
+        self._voices = load_voices(dataset, local_dir=voices_dir, voice_set=voice_set)
         self._model = None
         self._lock = threading.Lock()
 
